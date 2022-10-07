@@ -325,7 +325,7 @@ def train_model(model, model_test, criterion, optimizer, scheduler, num_epochs=2
             last_model_wts = model.state_dict()
             if epoch%20 == 19:
                 save_network(model, opt.name, epoch)
-            # draw_curve(epoch)
+            #draw_curve(epoch)
 
         time_elapsed = time.time() - since
         print('Training complete in {:.0f}m {:.0f}s'.format(
@@ -440,7 +440,7 @@ if opt.moving_avg<1.0:
     num_epochs = 140
 else:
     model_test = None
-    num_epochs = 160
+    num_epochs = 360
 
 model = train_model(model, model_test, criterion, optimizer_ft, exp_lr_scheduler,
                        num_epochs=num_epochs)

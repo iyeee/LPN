@@ -487,9 +487,6 @@ class ft_net_LPN(nn.Module):
         # self.usam_2 = USAM()
         self.sa1 = SpatialAttention()
         self.sa2 = SpatialAttention()
-        self.sa3 = SpatialAttention()
-        self.sa4 = SpatialAttention()
-        self.sa5 = SpatialAttention()
     def forward(self, x):
         x = self.model.conv1(x)
         x = self.model.bn1(x)
@@ -501,11 +498,8 @@ class ft_net_LPN(nn.Module):
         # x = self.usam_2(x)
         x = x+self.sa2(x) * x
         x = self.model.layer2(x)
-        x = x+self.sa3(x) * x
         x = self.model.layer3(x)
-        x = x+self.sa4(x) * x
         x = self.model.layer4(x)
-        x = x+self.sa5(x) * x
         # print(x.shape)
         if self.pool == 'avg+max':
             x1 = self.get_part_pool(x, pool='avg')

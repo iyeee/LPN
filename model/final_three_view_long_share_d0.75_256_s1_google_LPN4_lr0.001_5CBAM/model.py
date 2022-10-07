@@ -8,7 +8,7 @@ from torch.autograd import Variable
 from torch.nn import functional as F
 import sys
 sys.path.append('..')
-from attention.CBAM import CBAMBlock,SpatialAttention
+from attention.CBAM import CBAMBlock
 ######################################################################
 class USAM(nn.Module):
     def __init__(self, kernel_size=3, padding=1, polish=True):
@@ -485,27 +485,29 @@ class ft_net_LPN(nn.Module):
             #self.classifier.add_block = init_model.classifier.add_block
         # self.usam_1 = USAM()
         # self.usam_2 = USAM()
-        self.sa1 = SpatialAttention()
-        self.sa2 = SpatialAttention()
-        self.sa3 = SpatialAttention()
-        self.sa4 = SpatialAttention()
-        self.sa5 = SpatialAttention()
+        self.CBAM = CBAMBlock(channel=64)
+        self.CBAM1 = CBAMBlock(channel=256)
+        self.CBAM2 = CBAMBlock(channel=512)
+        self.CBAM3 = CBAMBlock(channel=1024)
+        self.CBAM4 = CBAMBlock(channel=2048)
     def forward(self, x):
         x = self.model.conv1(x)
         x = self.model.bn1(x)
         x = self.model.relu(x)
         # x = self.usam_1(x)
-        x = x+self.sa1(x) * x
+        # x = x+self.sa(x) * x
+        # x = x+self.sa(x) * x
+        x=x+self.CBAM(x)
         x = self.model.maxpool(x)
         x = self.model.layer1(x)
+        x=x+self.CBAM1(x)
         # x = self.usam_2(x)
-        x = x+self.sa2(x) * x
         x = self.model.layer2(x)
-        x = x+self.sa3(x) * x
+        x=x+self.CBAM2(x)
         x = self.model.layer3(x)
-        x = x+self.sa4(x) * x
+        x=x+self.CBAM3(x)
         x = self.model.layer4(x)
-        x = x+self.sa5(x) * x
+        x=x+self.CBAM4(x)
         # print(x.shape)
         if self.pool == 'avg+max':
             x1 = self.get_part_pool(x, pool='avg')

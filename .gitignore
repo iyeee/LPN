@@ -1,0 +1,6 @@
+galleryname.txt
+pytorch_result.mat
+query_name.txt
+gallery_name.txt
+*.pth
+__pycache__/

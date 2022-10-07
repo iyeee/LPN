@@ -20,6 +20,8 @@ import math
 from model import ft_net, two_view_net, three_view_net
 from utils import load_network
 from image_folder import customData, customData_one
+from torchvision.transforms import InterpolationMode
+from folder import ImageFolder
 #fp16
 try:
     from apex.fp16_utils import *
@@ -30,7 +32,7 @@ except ImportError: # will be 3.x series
 # --------
 
 parser = argparse.ArgumentParser(description='Training')
-parser.add_argument('--gpu_ids',default='0', type=str,help='gpu_ids: e.g. 0  0,1,2  0,2')
+parser.add_argument('--gpu_ids',default='2', type=str,help='gpu_ids: e.g. 0  0,1,2  0,2')
 parser.add_argument('--which_epoch',default='last', type=str, help='0,1,2,3...or last')
 parser.add_argument('--test_dir',default='./data/test',type=str, help='./test_data')
 parser.add_argument('--name', default='three_view_long_share_d0.75_256_s1_google', type=str, help='save model path')
@@ -52,7 +54,7 @@ opt = parser.parse_args()
 # load the training config
 config_path = os.path.join('./model',opt.name,'opts.yaml')
 with open(config_path, 'r') as stream:
-        config = yaml.load(stream)
+        config = yaml.load(stream,Loader=yaml.FullLoader)
 opt.fp16 = config['fp16'] 
 opt.use_dense = config['use_dense']
 opt.use_NAS = config['use_NAS']
@@ -101,7 +103,7 @@ if len(gpu_ids)>0:
 # data.
 #
 data_transforms = transforms.Compose([
-        transforms.Resize((opt.h, opt.w), interpolation=3),
+        transforms.Resize((opt.h, opt.w), interpolation=InterpolationMode.BICUBIC),
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 ])
@@ -116,7 +118,7 @@ transform_move_list = transforms.Compose([
 if opt.LPN:
     data_transforms = transforms.Compose([
         # transforms.Resize((384,192), interpolation=3),
-        transforms.Resize((opt.h,opt.w), interpolation=3),
+        transforms.Resize((opt.h,opt.w), interpolation=InterpolationMode.BICUBIC),
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]) 
     ])
@@ -129,8 +131,8 @@ if opt.multi:
     dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=opt.batchsize,
                                              shuffle=False, num_workers=16) for x in ['gallery','query','multi-query']}
 else:
-    # image_datasets = {x: datasets.ImageFolder( os.path.join(data_dir,x) ,data_transforms) for x in ['gallery_satellite','gallery_drone', 'gallery_street', 'query_satellite', 'query_drone', 'query_street']}
-    image_datasets = {x: datasets.ImageFolder( os.path.join(data_dir,x) ,data_transforms) for x in ['gallery_satellite','gallery_drone', 'gallery_street', 'gallery_satellite_usa_un']}
+    image_datasets = {x: datasets.ImageFolder( os.path.join(data_dir,x) ,data_transforms) for x in ['gallery_satellite','gallery_drone', 'gallery_street', 'query_satellite', 'query_drone', 'query_street']}
+    # image_datasets = {x: datasets.ImageFolder( os.path.join(data_dir,x) ,data_transforms) for x in ['gallery_satellite','gallery_drone', 'gallery_street', 'gallery_satellite_usa_un']}
     # image_datasets = {}
     # for x in ['gallery_satellite','gallery_drone', 'gallery_street', 'gallery_satellite_usa_un']:
     #     image_datasets[x] = customData( os.path.join(data_dir,x) ,data_transforms, rotate=0)
@@ -139,7 +141,8 @@ else:
             print('----------scale test--------------')
             image_datasets[x] = customData_one( os.path.join(data_dir,x) ,data_transforms, rotate=0, reverse=False)
     else:
-        for x in ['query_satellite', 'query_drone', 'query_street', 'query_drone_one']:
+        for x in ['query_satellite', 'query_drone', 'query_street']:
+        # for x in ['query_satellite', 'query_drone', 'query_street', 'query_drone_one']:
             if opt.pad > 0:
                 print('-----------move pixel test-----------')
                 image_datasets[x] = customData( os.path.join(data_dir,x) ,transform_move_list, rotate=0, pad=opt.pad)
@@ -153,7 +156,8 @@ else:
                                              shuffle=False, num_workers=16) for x in ['gallery_satellite', 'gallery_drone','gallery_street', 'gallery_satellite_usa_un', 'query_drone']}
     else:
         dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=opt.batchsize,
-                                             shuffle=False, num_workers=16) for x in ['gallery_satellite', 'gallery_drone','gallery_street', 'gallery_satellite_usa_un', 'query_satellite', 'query_drone', 'query_street', 'query_drone_one']}
+                                            shuffle=False, num_workers=16) for x in ['gallery_satellite', 'gallery_drone','gallery_street', 'query_satellite', 'query_drone', 'query_street']}
+                                            #  shuffle=False, num_workers=16) for x in ['gallery_satellite', 'gallery_drone','gallery_street', 'gallery_satellite_usa_un', 'query_satellite', 'query_drone', 'query_street', 'query_drone_one']}
 use_gpu = torch.cuda.is_available()
 
 ######################################################################
@@ -260,15 +264,15 @@ if use_gpu:
 since = time.time()
 
 # gallery_name = 'gallery_street' 
-# query_name = 'query_satellite' 
+query_name = 'query_satellite' 
 
-gallery_name = 'gallery_satellite'
+# gallery_name = 'gallery_satellite'
 # query_name = 'query_street'
 
 #gallery_name = 'gallery_street'
-query_name = 'query_drone'
+# query_name = 'query_drone'
 # query_name = 'query_drone_one'
-# gallery_name = 'gallery_drone'
+gallery_name = 'gallery_drone'
 # gallery_name = 'gallery_satellite_usa_un'
 which_gallery = which_view(gallery_name)
 which_query = which_view(query_name)

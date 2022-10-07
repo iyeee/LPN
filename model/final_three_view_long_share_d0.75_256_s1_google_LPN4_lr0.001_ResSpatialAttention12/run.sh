@@ -1,6 +1,6 @@
 # LPN  
 python train.py \
---name='final_three_view_long_share_d0.75_256_s1_google_LPN4_lr0.001_ResSpatialAttention12345' \
+--name='final_three_view_long_share_d0.75_256_s1_google_LPN4_lr0.001_ResSpatialAttention12' \
 --data_dir='/data/modanqi/projects/University1652-Baseline/data/train' \
 --views=3 \
 --droprate=0.75 \

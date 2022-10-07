@@ -1,6 +1,6 @@
 # LPN  
-python train.py \
---name='final_three_view_long_share_d0.75_256_s1_google_LPN4_lr0.001_ResSpatialAttention12345' \
+python train_pytorch14.py \
+--name='final_three_view_long_share_d0.75_256_s1_google_LPN4_lr0.001_usam' \
 --data_dir='/data/modanqi/projects/University1652-Baseline/data/train' \
 --views=3 \
 --droprate=0.75 \
@@ -13,12 +13,12 @@ python train.py \
 --block=4 \
 --lr=0.001 \
 --gpu_ids='0' \
---batchsize=8
+--batchsize=32
 # python test.py \
-# --name='final_three_view_long_share_d0.75_256_s1_google_LPN4_lr0.001_ResSpatialAttention' \
+# --name='final_three_view_long_share_d0.75_256_s1_google_LPN4_lr0.001' \
 # --test_dir='/data/modanqi/projects/University1652-Baseline/data/test' \
 # --batchsize=128 \
-# --gpu_ids='1'
+# --gpu_ids='2'
 
 # Baseline
 # python train.py \
