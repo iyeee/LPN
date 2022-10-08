@@ -15,10 +15,10 @@
 # --gpu_ids='0' \
 # --batchsize=8
 python test.py \
---name='final_three_view_long_share_d0.75_256_s1_google_LPN4_lr0.001_5CBAM' \
+--name='final_three_view_long_share_d0.75_256_s1_google_LPN4_lr0.001_ResSpatialAttention12' \
 --test_dir='/data/modanqi/projects/University1652-Baseline/data/test' \
 --batchsize=128 \
---gpu_ids='0'
+--gpu_ids='1'
 
 # Baseline
 # python train.py \
