@@ -188,7 +188,6 @@ def one_LPN_output(outputs, labels, criterion, block):
     for i in range(num_part):
         part = outputs[i]
         score += sm(part)
-        # 无效
         # if i==0 or i==1:
         #     loss += 1.5*criterion(part, labels)
         # else:

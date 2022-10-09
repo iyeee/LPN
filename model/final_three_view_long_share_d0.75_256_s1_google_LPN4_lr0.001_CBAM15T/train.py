@@ -188,11 +188,6 @@ def one_LPN_output(outputs, labels, criterion, block):
     for i in range(num_part):
         part = outputs[i]
         score += sm(part)
-        # 无效
-        # if i==0 or i==1:
-        #     loss += 1.5*criterion(part, labels)
-        # else:
-        #     loss += criterion(part, labels)
         loss += criterion(part, labels)
 
     _, preds = torch.max(score.data, 1)
@@ -436,8 +431,8 @@ if not opt.resume:
         yaml.dump(vars(opt), fp, default_flow_style=False)
 # model to gpu
 model = model.cuda()
-# if fp16:
-#     model, optimizer_ft = amp.initialize(model, optimizer_ft, opt_level = "O1")
+if fp16:
+    model, optimizer_ft = amp.initialize(model, optimizer_ft, opt_level = "O1")
 
 criterion = nn.CrossEntropyLoss()
 if opt.moving_avg<1.0:

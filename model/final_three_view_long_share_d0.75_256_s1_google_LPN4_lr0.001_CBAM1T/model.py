@@ -6,46 +6,8 @@ from torch.nn import init
 from torchvision import models
 from torch.autograd import Variable
 from torch.nn import functional as F
-import sys
-sys.path.append('..')
-import attentions.CBAM 
+from attentions.CBAM import CBAMBlock,SpatialAttention
 ######################################################################
-class USAM(nn.Module):
-    def __init__(self, kernel_size=3, padding=1, polish=True):
-        super(USAM, self).__init__()
-
-        kernel = torch.ones((kernel_size, kernel_size))
-        kernel = kernel.unsqueeze(0).unsqueeze(0)
-        self.weight = nn.Parameter(data=kernel, requires_grad=False)
-        
-
-        kernel2 = torch.ones((1, 1)) * (kernel_size * kernel_size)
-        kernel2 = kernel2.unsqueeze(0).unsqueeze(0)
-        self.weight2 = nn.Parameter(data=kernel2, requires_grad=False)
-
-        self.polish = polish
-        self.pad = padding
-        self.relu = nn.ReLU()
-        self.bn = nn.BatchNorm2d(1)
-
-    def __call__(self, x):
-        fmap = x.sum(1, keepdim=True)      
-        x1 = F.conv2d(fmap, self.weight, padding=self.pad)
-        x2 = F.conv2d(fmap, self.weight2, padding=0) 
-        
-        att = x2 - x1
-        att = self.bn(att)
-        att = self.relu(att)
-
-        if self.polish:
-            att[:, :, :, 0] = 0
-            att[:, :, :, -1] = 0
-            att[:, :, 0, :] = 0
-            att[:, :, -1, :] = 0
-
-        output = x + att * x
-
-        return output
 def weights_init_kaiming(m):
     classname = m.__class__.__name__
     # print(classname)
@@ -485,19 +447,25 @@ class ft_net_LPN(nn.Module):
             #self.classifier.add_block = init_model.classifier.add_block
         # self.usam_1 = USAM()
         # self.usam_2 = USAM()
-        self.sa = attention.CBAM.SpatialAttention()
+        # self.sa1 = SpatialAttention()
+        # self.sa2 = SpatialAttention()
+        # self.sa3 = SpatialAttention()
+        # self.sa4 = SpatialAttention()
+        # self.sa5 = SpatialAttention()
+        self.cbam=CBAMBlock(channel=64)
     def forward(self, x):
         x = self.model.conv1(x)
         x = self.model.bn1(x)
         x = self.model.relu(x)
         # x = self.usam_1(x)
-        x = x+self.sa(x) * x
+        # x = x+self.sa1(x) * x
+        x=self.cbam(x)
         x = self.model.maxpool(x)
         x = self.model.layer1(x)
-        # x = self.usam_2(x)
         x = self.model.layer2(x)
         x = self.model.layer3(x)
         x = self.model.layer4(x)
+        # x = x+self.sa5(x) * x
         # print(x.shape)
         if self.pool == 'avg+max':
             x1 = self.get_part_pool(x, pool='avg')
