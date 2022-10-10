@@ -270,7 +270,7 @@ def train_model(model, model_test, criterion, optimizer, scheduler, num_epochs=2
                         loss = criterion(outputs, labels) + criterion(outputs2, labels2)
                     elif opt.views == 3:
                         _, preds3 = torch.max(outputs3.data, 1)
-                        loss = criterion(outputs, labels) + criterion(outputs2, labels2) + criterion(outputs3, labels3)
+                        loss = criterion(outputs, labels) + 0*criterion(outputs2, labels2) + criterion(outputs3, labels3)
                         if opt.extra_Google:
                             loss += criterion(outputs4, labels4)
                 else:

@@ -266,12 +266,12 @@ since = time.time()
 
 
 # satellite->drone 1->3
-query_name = 'query_satellite' 
-gallery_name = 'gallery_drone'
+# query_name = 'query_satellite' 
+# gallery_name = 'gallery_drone'
 
 # drone->satellite 3->1
-# query_name = 'query_drone'
-# gallery_name = 'gallery_satellite'
+query_name = 'query_drone'
+gallery_name = 'gallery_satellite'
 
 
 

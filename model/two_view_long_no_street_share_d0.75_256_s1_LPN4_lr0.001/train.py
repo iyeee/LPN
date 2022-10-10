@@ -25,6 +25,7 @@ import yaml
 import math
 from shutil import copyfile
 from utils import update_average, get_model_list, load_network, save_network, make_weights_for_balanced_classes
+from torchvision.transforms import InterpolationMode
 
 version =  torch.__version__
 #fp16
@@ -92,7 +93,7 @@ if len(gpu_ids)>0:
 
 transform_train_list = [
         #transforms.RandomResizedCrop(size=(opt.h, opt.w), scale=(0.75,1.0), ratio=(0.75,1.3333), interpolation=3), #Image.BICUBIC)
-        transforms.Resize((opt.h, opt.w), interpolation=3),
+        transforms.Resize((opt.h, opt.w), interpolation=InterpolationMode.BICUBIC),
         transforms.Pad( opt.pad, padding_mode='edge'),
         transforms.RandomCrop((opt.h, opt.w)),
         transforms.RandomHorizontalFlip(),
@@ -101,7 +102,7 @@ transform_train_list = [
         ]
 
 transform_satellite_list = [
-        transforms.Resize((opt.h, opt.w), interpolation=3),
+        transforms.Resize((opt.h, opt.w), interpolation=InterpolationMode.BICUBIC),
         transforms.Pad( opt.pad, padding_mode='edge'),
         transforms.RandomAffine(90),
         transforms.RandomCrop((opt.h, opt.w)),
@@ -111,7 +112,7 @@ transform_satellite_list = [
         ]
 
 transform_val_list = [
-        transforms.Resize(size=(opt.h, opt.w),interpolation=3), #Image.BICUBIC
+        transforms.Resize(size=(opt.h, opt.w),interpolation=InterpolationMode.BICUBIC), #Image.BICUBIC
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ]
@@ -187,6 +188,11 @@ def one_LPN_output(outputs, labels, criterion, block):
     for i in range(num_part):
         part = outputs[i]
         score += sm(part)
+        # 无效
+        # if i==0 or i==1:
+        #     loss += 1.5*criterion(part, labels)
+        # else:
+        #     loss += criterion(part, labels)
         loss += criterion(part, labels)
 
     _, preds = torch.max(score.data, 1)
@@ -275,7 +281,7 @@ def train_model(model, model_test, criterion, optimizer, scheduler, num_epochs=2
                         loss = loss + loss2
                     elif opt.views == 3:
                         preds3, loss3 = one_LPN_output(outputs3, labels3, criterion, opt.block)
-                        loss = loss + loss2 + loss3 
+                        loss = loss + 0*loss2 + loss3 
                         if opt.extra_Google:
                             _, loss4 = one_LPN_output(outputs4, labels4, criterion, opt.block)
                             loss = loss + loss4
@@ -324,7 +330,7 @@ def train_model(model, model_test, criterion, optimizer, scheduler, num_epochs=2
             last_model_wts = model.state_dict()
             if epoch%20 == 19:
                 save_network(model, opt.name, epoch)
-            #draw_curve(epoch)
+            # draw_curve(epoch)
 
         time_elapsed = time.time() - since
         print('Training complete in {:.0f}m {:.0f}s'.format(
@@ -430,8 +436,8 @@ if not opt.resume:
         yaml.dump(vars(opt), fp, default_flow_style=False)
 # model to gpu
 model = model.cuda()
-if fp16:
-    model, optimizer_ft = amp.initialize(model, optimizer_ft, opt_level = "O1")
+# if fp16:
+#     model, optimizer_ft = amp.initialize(model, optimizer_ft, opt_level = "O1")
 
 criterion = nn.CrossEntropyLoss()
 if opt.moving_avg<1.0:
@@ -439,7 +445,7 @@ if opt.moving_avg<1.0:
     num_epochs = 140
 else:
     model_test = None
-    num_epochs = 120
+    num_epochs = 160
 
 model = train_model(model, model_test, criterion, optimizer_ft, exp_lr_scheduler,
                        num_epochs=num_epochs)

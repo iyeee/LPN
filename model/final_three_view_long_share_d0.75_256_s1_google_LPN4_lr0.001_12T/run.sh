@@ -12,7 +12,7 @@ python train.py \
 --extra \
 --block=4 \
 --lr=0.001 \
---gpu_ids='1' \
+--gpu_ids='0' \
 --batchsize=8
 # python test.py \
 # --name='final_three_view_long_share_d0.75_256_s1_google_LPN4_lr0.001_ResSpatialAttention' \

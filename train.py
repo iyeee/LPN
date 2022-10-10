@@ -281,7 +281,7 @@ def train_model(model, model_test, criterion, optimizer, scheduler, num_epochs=2
                         loss = loss + loss2
                     elif opt.views == 3:
                         preds3, loss3 = one_LPN_output(outputs3, labels3, criterion, opt.block)
-                        loss = loss + loss2 + loss3 
+                        loss = loss + 0*loss2 + loss3 
                         if opt.extra_Google:
                             _, loss4 = one_LPN_output(outputs4, labels4, criterion, opt.block)
                             loss = loss + loss4
