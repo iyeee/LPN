@@ -468,7 +468,7 @@ class ft_net_LPN(nn.Module):
         x = self.model.layer4(x)
         # x=self.cbam2(x)
         # x = x+self.sa5(x) * x
-        print(x.shape)
+        # print(x.shape)
         if self.pool == 'avg+max':
             x1 = self.get_part_pool(x, pool='avg')
             x2 = self.get_part_pool(x, pool='max')
@@ -534,7 +534,6 @@ class ft_net_LPN_convnext(nn.Module):
 
     def forward(self, x):
         x=self.model.forward_features(x)
-        print(x.shape)
         x = self.get_part_pool(x)
         x = x.view(x.size(0), x.size(1), -1)
         return x
@@ -917,7 +916,7 @@ if __name__ == '__main__':
 # Test the model, before you train it. 
     # net = two_view_net(701, droprate=0.5, pool='avg', stride=1, VGG16=False, LPN=True, block=8)
 
-    net = three_view_net_convnext(701, droprate=0.5, pool='avg', stride=1, share_weight=True, LPN=True, block=2)
+    net = three_view_net(701, droprate=0.5, pool='avg', stride=1, share_weight=True, LPN=True, block=2)
     # net.eval()
 
     # net = ft_net_VGG16_LPN_R(701)
