@@ -92,10 +92,10 @@ class ConvNeXt(nn.Module):
             )
             self.stages.append(stage)
             cur += depths[i]
-
+        
         self.norm = nn.LayerNorm(dims[-1], eps=1e-6) # final norm layer
+        # self.bn=nn.BatchNorm2d(dims[-1])
         self.head = nn.Linear(dims[-1], num_classes)
-
         self.apply(self._init_weights)
         self.head.weight.data.mul_(head_init_scale)
         self.head.bias.data.mul_(head_init_scale)
@@ -109,7 +109,17 @@ class ConvNeXt(nn.Module):
         for i in range(4):
             x = self.downsample_layers[i](x)
             x = self.stages[i](x)
-        return self.norm(x.mean([-2, -1])) # global average pooling, (N, C, H, W) -> (N, C)
+        # print(x.shape)   
+        # x=self.norm(x.mean([-2,-1])) # global average pooling, (N, C, H, W) -> (N, C)
+
+        # x=self.norm(x.permute(0,2,3,1))
+        # print(x.shape)
+        # x.permute(0,1,2,3)
+        # print(x.shape)
+        # x=self.bn(x)
+        # print(x.shape) 
+        # return x.permute(0,3,1,2)
+        return x
 
     def forward(self, x):
         x = self.forward_features(x)

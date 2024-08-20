@@ -13,6 +13,9 @@ import torchvision
 from torchvision import datasets, models, transforms
 from PIL import Image
 import cv2 
+from pytorch_grad_cam import GradCAM, HiResCAM, ScoreCAM, GradCAMPlusPlus, AblationCAM, XGradCAM, EigenCAM, FullGrad
+from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
+from pytorch_grad_cam.utils.image import show_cam_on_image
 
 def draw_CAM(model, img_path, save_path, transform=None, visual_heatmap=False):
 
@@ -80,16 +83,16 @@ def draw_CAM(model, img_path, save_path, transform=None, visual_heatmap=False):
 os.environ["CUDA_VISIBLE_DEVICES"] = '2'
 parser = argparse.ArgumentParser(description='Training')
 
-parser.add_argument('--data_dir',default='/home/wangtyu/datasets/University-Release/test',type=str, help='./test_data')
-parser.add_argument('--name', default='three_view_long_share_d0.75_256_s1_google_PCB4_lr0.001', type=str, help='save model path')
+parser.add_argument('--data_dir',default='/data/modanqi/datasets/data/test',type=str, help='./test_data')
+parser.add_argument('--name', default='final_three_view_long_share_d0.75_256_s1_google_LPN4_lr0.001', type=str, help='save model path')
 parser.add_argument('--batchsize', default=1, type=int, help='batchsize')
 
 opt = parser.parse_args()
 config_path = os.path.join('./model',opt.name,'opts.yaml')
 with open(config_path, 'r') as stream:
-    config = yaml.load(stream)
+        config = yaml.load(stream,Loader=yaml.FullLoader)
 opt.fp16 = config['fp16']
-opt.PCB = config['PCB']
+# opt.PCB = config['PCB']
 opt.stride = config['stride']
 opt.block = config['block']
 opt.views = config['views']
@@ -109,6 +112,6 @@ data_transforms = transforms.Compose([
 imgname = 'gallery_drone/0721/image-28.jpeg'
 print(opt.data_dir)
 img_path = os.path.join(opt.data_dir,imgname)
-save_path = '/home/wangtyu/cam_headmap.jpg'
+save_path = '/data/modanqi/projects/new/LPN/cam_headmap.jpg'
 model, _, epoch = load_network(opt.name, opt)
 draw_CAM(model, img_path, save_path, transform=data_transforms, visual_heatmap=False)

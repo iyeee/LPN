@@ -3,7 +3,7 @@ import torch
 import yaml
 import torch.nn as nn
 import parser
-from model import ft_net, two_view_net, three_view_net
+from model import ft_net, three_view_net_convnext, two_view_net, three_view_net
 
 def make_weights_for_balanced_classes(images, nclasses):
     count = [0] * nclasses

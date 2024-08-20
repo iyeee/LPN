@@ -15,10 +15,10 @@
 # --gpu_ids='0' \
 # --batchsize=8
 python test.py \
---name='two_view_long_no_street_share_d0.75_256_s1_LPN4_lr0.001' \
+--name='final_three_view_long_share_d0.75_256_s1_google_LPN4_lr0.001_bz8_convnextTiny_permute' \
 --test_dir='/data/modanqi/projects/University1652-Baseline/data/test' \
 --batchsize=128 \
---gpu_ids='1'
+--gpu_ids='0'
 
 # Baseline
 # python train.py \

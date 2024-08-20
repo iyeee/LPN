@@ -920,25 +920,31 @@ if __name__ == '__main__':
 # Test the model, before you train it. 
     # net = two_view_net(701, droprate=0.5, pool='avg', stride=1, VGG16=False, LPN=True, block=8)
 
-    net = two_view_net(701, droprate=0.5, pool='avg', stride=1, share_weight=True, LPN=True, block=2)
+    net = three_view_net_convnext(701, droprate=0.5, pool='avg', stride=1, share_weight=True, LPN=True, block=2)
     # net.eval()
-    # input = Variable(torch.FloatTensor(2, 3, 256, 256))
+
+    # net = ft_net_VGG16_LPN_R(701)
+    # net = ft_net_cvusa_LPN(701, stride=1)
+    # net = ft_net(701)
+
+    # print(net)
+
+    input = Variable(torch.FloatTensor(2, 3, 256, 256))
     # output1,output2 = net(input,input)
-    # output1,output2,output3 = net(input,input,input)
-
-    # net = two_view_net(class_num=751,block=3)
-    net.cuda()
-
-    input1 = Variable(torch.FloatTensor(8, 3, 256, 256)).cuda()
-    output1,output1 =net(input1,input1)
-    # print(output1)
-
-    # modelData = "/data/modanqi/projects/geo_location/model/new_4090_lr001_three_view_long_share_d0.75_256_s1_bz8_160epoch_vanB3/net_139.pth" 
-    # torch.onnx.export(net, input1,input1, modelData) 
-    # netron.start(modelData) 
-
-
-    flops,params=profile(net,inputs=(input1,input1,))
-    print('flops: ', flops/1000000, 'params: ', params/1000000)
+    output1,output2,output3 = net(input,input,input)
+    # output1 = net(input)
     # print('net output size:')
-    # print(output2.shape)
+    # print(output1.shape)
+    # print(output.shape)
+    for i in range(len(output1)):
+        print(output1[i].shape)
+    # x = torch.randn(2,512,8,8)
+    # x_shape = x.shape
+    # pool = AzimuthPool2d(x_shape, 8)
+    # out = pool(x)
+    # print(out.shape)
+    # input=torch.randn(128,512,16,16)
+    # cbam = CBAMBlock(channel=512,reduction=16,kernel_size=7)
+    # output=cbam(input)
+    # print(input.shape)
+    # print(output.shape)
